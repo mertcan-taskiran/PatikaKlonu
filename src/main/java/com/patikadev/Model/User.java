@@ -80,9 +80,9 @@ public class User {
                 obj = new User();
                 obj.setId(rs.getInt("id"));
                 obj.setName(rs.getString("name"));
-                obj.setName(rs.getString("uname"));
-                obj.setName(rs.getString("password"));
-                obj.setName(rs.getString("type"));
+                obj.setUname(rs.getString("uname"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("type"));
                 userList.add(obj);
             }
         } catch (SQLException e) {
