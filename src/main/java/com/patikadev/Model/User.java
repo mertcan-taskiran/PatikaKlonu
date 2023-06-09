@@ -1,5 +1,12 @@
 package com.patikadev.Model;
 
+import com.patikadev.Helper.DBConnector;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
 public class User {
     private int id;
     private String name;
@@ -56,5 +63,31 @@ public class User {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public static ArrayList<User> getList(){
+        ArrayList<User> userList = new ArrayList<>();
+
+        String query = "Select * FROM User";
+
+        User obj;
+
+        try {
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery(query);
+
+            while (rs.next()){
+                obj = new User();
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setName(rs.getString("uname"));
+                obj.setName(rs.getString("password"));
+                obj.setName(rs.getString("type"));
+                userList.add(obj);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userList;
     }
 }
