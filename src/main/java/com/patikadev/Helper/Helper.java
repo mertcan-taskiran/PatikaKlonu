@@ -17,6 +17,7 @@ public class Helper {
             }
         }
     }
+
     public static int scCenter(String eksen, Dimension size){
         int point;
         switch (eksen){
@@ -31,4 +32,32 @@ public class Helper {
         }
         return point;
     }
+
+    public static boolean isFieldEmpty(JTextField field){
+        return field.getText().trim().length() == 0;
+    }
+
+    public static void showMsg(String str){
+        String msg;
+        String title;
+        switch (str){
+            case "fill":
+                msg = "Lütfen tüm alanları doldurunuz !";
+                title = "Hata";
+                break;
+            case "done":
+                msg = "İşlem Başarılı !";
+                title = "Başarılı";
+                break;
+            case "error":
+                msg = "Hata Oluştu !";
+                title = "Hata";
+                break;
+            default:
+                msg = str;
+                title = "Mesaj";
+        }
+        JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
 }
