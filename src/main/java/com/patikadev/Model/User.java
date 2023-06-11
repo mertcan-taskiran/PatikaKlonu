@@ -155,4 +155,60 @@ public class User {
         return true;
     }
 
+    public static boolean update(int id , String name, String uname, String pass, String type){
+        String query = "UPDATE user SET name=?, uname=?, pass=?, type=? WHERE id=?";
+        User findUser = User.getFetch(uname);
+        if (findUser != null && findUser.getId() != id){
+            Helper.showMsg("Bu kullanıcı daha önceden eklenmiş !");
+            return false;
+        }
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1, name);
+            pr.setString(2, uname);
+            pr.setString(3, pass);
+            pr.setString(4, type);
+            pr.setInt(5, id);
+            return pr.executeUpdate() != -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public static ArrayList<User> searchUserList(String query){
+        ArrayList<User> userList = new ArrayList<>();
+        User obj;
+
+        try {
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery(query);
+
+            while (rs.next()){
+                obj = new User();
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUname(rs.getString("uname"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("type"));
+                userList.add(obj);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userList;
+    }
+
+    public static String searchQuery(String name, String uname, String type){
+        String query = "SELECT * FROM user WHERE uname LIKE '%{{uname}}%' AND name LIKE '%{{name}}%'";
+        query = query.replace("{{uname}}", uname);
+        query = query.replace("{{name}}", name);
+        if (!type.isEmpty()){
+            query += " AND type='{{type}}'";
+            query = query.replace("{{type}}", type);
+        }
+
+        return query;
+    }
+
 }
