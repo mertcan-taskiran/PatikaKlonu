@@ -1,6 +1,7 @@
 package com.patikadev.View;
 import com.patikadev.Helper.*;
 import com.patikadev.Model.Operator;
+import com.patikadev.Model.Patika;
 import com.patikadev.Model.User;
 
 import javax.swing.*;
@@ -30,8 +31,17 @@ public class OperatorGUI extends JFrame {
     private JTextField fld_srcUname;
     private JComboBox cmb_src_userType;
     private JButton btn_src;
+    private JPanel pnl_patikaList;
+    private JScrollPane scrl_patikaList;
+    private JTable tbl_patikaList;
+    private JPanel pnl_patikaAdd;
+    private JTextField fld_patikaName;
+    private JButton btn_patikaAdd;
     private DefaultTableModel mdl_userList;
     private Object[] row_userList;
+
+    private DefaultTableModel mdl_patikaList;
+    private Object[] row_patikaList;
 
     private final Operator operator;
 
@@ -90,6 +100,16 @@ public class OperatorGUI extends JFrame {
             }
         });
 
+        mdl_patikaList = new DefaultTableModel();
+        Object[] col_patika_list = {"ID", "Patika Adı"};
+        mdl_patikaList.setColumnIdentifiers(col_patika_list);
+        row_patikaList = new Object[col_patika_list.length];
+        loadPatikaModel();
+
+        tbl_patikaList.setModel(mdl_patikaList);
+        tbl_patikaList.getTableHeader().setReorderingAllowed(false);
+        tbl_patikaList.getColumnModel().getColumn(0).setMaxWidth(75);
+
         btn_userAdd.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_userName) || Helper.isFieldEmpty(fld_userUname) || Helper.isFieldEmpty(fld_userPass)){
                 Helper.showMsg("fill");
@@ -142,6 +162,21 @@ public class OperatorGUI extends JFrame {
         btn_logout.addActionListener(e -> {
             dispose();
         });
+
+        btn_patikaAdd.addActionListener(e -> {
+
+        });
+    }
+
+    private void loadPatikaModel() {
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_patikaList.getModel();
+        clearModel.setRowCount(0);
+        int i=0;
+        for (Patika obj : Patika.getList()){
+            row_patikaList[i++] = obj.getId();
+            row_patikaList[i++] = obj.getName();
+            mdl_patikaList.addRow(row_patikaList);
+        }
     }
 
     public void loadUserModel(){
