@@ -7,8 +7,8 @@ import com.patikadev.Model.User;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class OperatorGUI extends JFrame {
@@ -44,7 +44,7 @@ public class OperatorGUI extends JFrame {
     private Object[] row_patikaList;
 
     private final Operator operator;
-
+    private JPopupMenu patikaMenu;
     public OperatorGUI(Operator operator){
         this.operator = operator;
 
@@ -100,6 +100,36 @@ public class OperatorGUI extends JFrame {
             }
         });
 
+        // patika list
+        patikaMenu = new JPopupMenu();
+        JMenuItem updateMenu = new JMenuItem("Güncelle");
+        JMenuItem deleteMenu = new JMenuItem("Sil");
+        patikaMenu.add(updateMenu);
+        patikaMenu.add(deleteMenu);
+
+        updateMenu.addActionListener(e -> {
+            int select_id = Integer.parseInt(tbl_patikaList.getValueAt(tbl_patikaList.getSelectedRow(), 0).toString());
+            UpdatePatikaGUI updateGUI = new UpdatePatikaGUI(Patika.getFetch(select_id));
+            updateGUI.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    loadPatikaModel();
+                }
+            });
+        });
+
+        deleteMenu.addActionListener(e -> {
+            if (Helper.confirm("sure")){
+                int select_id = Integer.parseInt(tbl_patikaList.getValueAt(tbl_patikaList.getSelectedRow(), 0).toString());
+                if (Patika.delete(select_id)){
+                    Helper.showMsg("done");
+                    loadPatikaModel();
+                }else{
+                    Helper.showMsg("error");
+                }
+            }
+        });
+
         mdl_patikaList = new DefaultTableModel();
         Object[] col_patika_list = {"ID", "Patika Adı"};
         mdl_patikaList.setColumnIdentifiers(col_patika_list);
@@ -107,8 +137,18 @@ public class OperatorGUI extends JFrame {
         loadPatikaModel();
 
         tbl_patikaList.setModel(mdl_patikaList);
+        tbl_patikaList.setComponentPopupMenu(patikaMenu);
         tbl_patikaList.getTableHeader().setReorderingAllowed(false);
         tbl_patikaList.getColumnModel().getColumn(0).setMaxWidth(75);
+
+        tbl_patikaList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int selected_row = tbl_patikaList.rowAtPoint(point);
+                tbl_patikaList.setRowSelectionInterval(selected_row, selected_row);
+            }
+        });
 
         btn_userAdd.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_userName) || Helper.isFieldEmpty(fld_userUname) || Helper.isFieldEmpty(fld_userPass)){
@@ -141,13 +181,15 @@ public class OperatorGUI extends JFrame {
                 Helper.showMsg("fill");
             } else
             {
-                int fld_user_id = Integer.parseInt(fld_userId.getText());
-                if (User.delete(fld_user_id)){
-                    Helper.showMsg("done");
-                    loadUserModel();
-                }else {
-                    Helper.showMsg("error");
-                }
+               if (Helper.confirm("sure")){
+                   int fld_user_id = Integer.parseInt(fld_userId.getText());
+                   if (User.delete(fld_user_id)){
+                       Helper.showMsg("done");
+                       loadUserModel();
+                   }else {
+                       Helper.showMsg("error");
+                   }
+               }
             }
         });
 
@@ -164,7 +206,19 @@ public class OperatorGUI extends JFrame {
         });
 
         btn_patikaAdd.addActionListener(e -> {
-
+            if (Helper.isFieldEmpty(fld_patikaName)){
+                Helper.showMsg("fill");
+            } else {
+                if (Patika.add(fld_patikaName.getText())){
+                    Helper.showMsg("done");
+                    loadPatikaModel();
+                    fld_patikaName.setText(null);
+                }
+                else
+                {
+                    Helper.showMsg("error");
+                }
+            }
         });
     }
 
@@ -173,6 +227,7 @@ public class OperatorGUI extends JFrame {
         clearModel.setRowCount(0);
         int i=0;
         for (Patika obj : Patika.getList()){
+            i=0;
             row_patikaList[i++] = obj.getId();
             row_patikaList[i++] = obj.getName();
             mdl_patikaList.addRow(row_patikaList);

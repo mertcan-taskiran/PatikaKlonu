@@ -60,4 +60,17 @@ public class Helper {
         JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public static boolean confirm(String str){
+        String msg;
+
+        switch (str){
+            case "sure":
+                msg = "Bu işlemden emin misin?";
+                break;
+            default:
+                msg = str;
+        }
+        return JOptionPane.showConfirmDialog(null, msg, "Son kararın mı?", JOptionPane.YES_NO_OPTION) == 0;
+    }
+
 }
