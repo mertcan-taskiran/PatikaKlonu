@@ -1,5 +1,6 @@
 package com.patikadev.View;
 import com.patikadev.Helper.*;
+import com.patikadev.Model.Course;
 import com.patikadev.Model.Operator;
 import com.patikadev.Model.Patika;
 import com.patikadev.Model.User;
@@ -37,14 +38,24 @@ public class OperatorGUI extends JFrame {
     private JPanel pnl_patikaAdd;
     private JTextField fld_patikaName;
     private JButton btn_patikaAdd;
+    private JPanel pnl_courseForm;
+    private JScrollPane scrl_courseList;
+    private JTable tbl_courseList;
+    private JPanel pnl_courseAdd;
+    private JTextField fld_courseName;
+    private JTextField fld_courseLang;
+    private JComboBox cmb_coursePatika;
+    private JComboBox cmb_courseUser;
+    private JButton btn_courseAdd;
     private DefaultTableModel mdl_userList;
     private Object[] row_userList;
-
     private DefaultTableModel mdl_patikaList;
     private Object[] row_patikaList;
-
     private final Operator operator;
     private JPopupMenu patikaMenu;
+    private DefaultTableModel mdl_course_list;
+    private Object[] row_course_list;
+
     public OperatorGUI(Operator operator){
         this.operator = operator;
 
@@ -57,7 +68,8 @@ public class OperatorGUI extends JFrame {
 
         lbl_welcome.setText("Hoşgeldin " + operator.getName());
 
-        // ModelUserList
+        // User List
+
         mdl_userList = new DefaultTableModel(){
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -66,6 +78,7 @@ public class OperatorGUI extends JFrame {
                 return super.isCellEditable(row, column);
             }
         };
+
         Object[] col_userList = {"Id", "Ad Soyad", "Kullanıcı Adı", "Şifre", "Üyelik Tipi"};
         mdl_userList.setColumnIdentifiers(col_userList);
 
@@ -100,7 +113,8 @@ public class OperatorGUI extends JFrame {
             }
         });
 
-        // patika list
+        // Patika List
+
         patikaMenu = new JPopupMenu();
         JMenuItem updateMenu = new JMenuItem("Güncelle");
         JMenuItem deleteMenu = new JMenuItem("Sil");
@@ -114,6 +128,7 @@ public class OperatorGUI extends JFrame {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadPatikaModel();
+                    loadPatikaCombo();
                 }
             });
         });
@@ -124,6 +139,7 @@ public class OperatorGUI extends JFrame {
                 if (Patika.delete(select_id)){
                     Helper.showMsg("done");
                     loadPatikaModel();
+                    loadPatikaCombo();
                 }else{
                     Helper.showMsg("error");
                 }
@@ -149,6 +165,23 @@ public class OperatorGUI extends JFrame {
                 tbl_patikaList.setRowSelectionInterval(selected_row, selected_row);
             }
         });
+
+        // Course List
+
+        mdl_course_list = new DefaultTableModel();
+        Object[] col_courseList = {"ID", "Ders Adı", "Programlama Dili", "Patika", "Eğitmen"};
+        mdl_course_list.setColumnIdentifiers(col_courseList);
+        row_course_list = new Object[col_courseList.length];
+
+        loadCourseList();
+
+        tbl_courseList.setModel(mdl_course_list);
+        tbl_courseList.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_courseList.getTableHeader().setReorderingAllowed(false);
+
+        loadPatikaCombo();
+
+        // Buttons
 
         btn_userAdd.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_userName) || Helper.isFieldEmpty(fld_userUname) || Helper.isFieldEmpty(fld_userPass)){
@@ -212,6 +245,7 @@ public class OperatorGUI extends JFrame {
                 if (Patika.add(fld_patikaName.getText())){
                     Helper.showMsg("done");
                     loadPatikaModel();
+                    loadPatikaCombo();
                     fld_patikaName.setText(null);
                 }
                 else
@@ -220,6 +254,24 @@ public class OperatorGUI extends JFrame {
                 }
             }
         });
+    }
+
+    // Loads
+
+    private void loadCourseList() {
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_courseList.getModel();
+        clearModel.setRowCount(0);
+        int i=0;
+        for (Course obj : Course.getList()){
+            i=0;
+            row_course_list[i++] = obj.getId();
+            row_course_list[i++] = obj.getName();
+            row_course_list[i++] = obj.getLang();
+            row_course_list[i++] = obj.getPatika().getName();
+            row_course_list[i++] = obj.getEducator().getName();
+
+            mdl_course_list.addRow(row_course_list);
+        }
     }
 
     private void loadPatikaModel() {
@@ -261,6 +313,13 @@ public class OperatorGUI extends JFrame {
             row_userList[3] = obj.getPass();
             row_userList[4] = obj.getType();
             mdl_userList.addRow(row_userList);
+        }
+    }
+
+    public void loadPatikaCombo(){
+        cmb_coursePatika.removeAllItems();
+        for (Patika obj : Patika.getList()){
+            cmb_coursePatika.addItem(new Item(obj.getId(), obj.getName()));
         }
     }
 
