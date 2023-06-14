@@ -245,6 +245,7 @@ public class OperatorGUI extends JFrame {
 
         btn_logout.addActionListener(e -> {
             dispose();
+            LoginGUI login = new LoginGUI();
         });
 
         btn_patikaAdd.addActionListener(e -> {
@@ -273,6 +274,7 @@ public class OperatorGUI extends JFrame {
                 if (Course.add(userItem.getKey(), patikaItem.getKey(), fld_courseName.getText(), fld_courseLang.getText())){
                     Helper.showMsg("done");
                     loadCourseModel();
+                    loadPatikaCombo();
                     fld_courseLang.setText(null);
                     fld_courseName.setText(null);
                 } else {
