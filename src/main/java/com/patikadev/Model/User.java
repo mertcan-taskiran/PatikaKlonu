@@ -69,9 +69,7 @@ public class User {
 
     public static ArrayList<User> getList(){
         ArrayList<User> userList = new ArrayList<>();
-
         String query = "Select * FROM User";
-
         User obj;
 
         try {
@@ -156,6 +154,12 @@ public class User {
                 switch (rs.getString("type")){
                     case "operator":
                         obj = new Operator();
+                        break;
+                    case "educator":
+                        obj = new Educator();
+                        break;
+                    case "student":
+                        obj = new Student();
                         break;
                     default:
                         obj = new User();
@@ -262,8 +266,63 @@ public class User {
             query += " AND type='{{type}}'";
             query = query.replace("{{type}}", type);
         }
-
         return query;
+    }
+
+    private static ArrayList<User> getUsers(String query) {
+        ArrayList<User> userList = new ArrayList<>();
+        User obj;
+        try {
+
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()){
+                obj = new User();
+                obj.setId((rs.getInt("id")));
+                obj.setName(rs.getString("name"));
+                obj.setUname(rs.getString("uname"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("type"));
+                userList.add(obj);
+
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userList;
+    }
+
+    public static int getPatikaID(String patikaName){
+        String query = "SELECT id FROM patika WHERE name = ?";
+        int id = 0;
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1,patikaName);
+            ResultSet rs = pr.executeQuery();
+            while (rs.next()){
+                id = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return id;
+    }
+
+    public static int getUserIdByPatikaName(String patikaName){
+        int id = getPatikaID(patikaName);
+        String query = "SELECT user_id FROM course WHERE patika_id = " + id;
+        try {
+            Statement st = DBConnector.getInstance().createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()){
+                id = rs.getInt("user_id");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return id;
+
     }
 
 }

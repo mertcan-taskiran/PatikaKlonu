@@ -37,6 +37,10 @@ public class Helper {
         return field.getText().trim().length() == 0;
     }
 
+    public static boolean isFieldEmpty(JEditorPane pane){
+        return pane.getText().trim().isEmpty();
+    }
+
     public static void showMsg(String str){
         String msg;
         String title;
